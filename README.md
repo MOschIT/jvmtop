@@ -131,20 +131,20 @@ The profiler uses a lower sample rate than traditional profilers, but is suffici
 <hr />
 
 <h3>Installation</h3>
-Click on the <a href="https://github.com/MOschIT/jvmtop/releases">releases tab</a>, download the
-most recent tar.gz archive. Extract it, ensure that the <code>JAVA_HOME</code> environment variable points to a valid JDK and run <code>./jvmtop.sh</code>.<br><br>
-Further information can be found in the <a href="https://github.com/MOschIT/jvmtop/blob/master/INSTALL">INSTALL file</a>
-
-<hr />
-
-<h3>Building from source</h3>
+Pre-built binaries are not available. You need to build jvmtop yourself.
 Requires JDK 21+ and Maven.
 
-<pre><code>./build.sh</code></pre>
+<h4>1. Get the source code</h4>
+Clone the repository:
+<pre><code>git clone https://github.com/MOschIT/jvmtop.git
+cd jvmtop</code></pre>
+Or download the source archive (source.tar.gz / source.zip) from the <a href="https://github.com/MOschIT/jvmtop/releases">releases page</a> and extract it.
 
+<h4>2. Build</h4>
+<pre><code>./build.sh</code></pre>
 This produces <code>target/jvmtop-0.9.0.jar</code> and copies dependencies into <code>target/lib/</code>.
 
-<h4>Running on JDK 9+</h4>
+<h4>3. Run</h4>
 Jvmtop uses internal JDK APIs (<code>sun.jvmstat.monitor</code>, <code>jdk.internal.agent</code>, etc.)
 that are encapsulated starting with JDK 9. You must pass <code>--add-opens</code> flags at runtime:
 
