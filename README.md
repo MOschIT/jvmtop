@@ -19,7 +19,8 @@ This fork is also licensed under the GPL v2.0.
 
 <hr />
 
-<h3>Overview</h3>
+<h3>Overview mode</h3>
+Run with no arguments to monitor all accessible JVMs on the machine.
 
 <pre>
   JvmTop 0.9.0   amd64,  8 cpus, Linux 5.15.0, load avg 0.42
@@ -50,6 +51,85 @@ This fork is also licensed under the GPL v2.0.
 
 <hr />
 
+<h3>Detail mode</h3>
+Use <code>-p &lt;PID&gt;</code> to connect to a specific JVM and see thread-level detail.
+
+<pre><code>jvmtop -p 12345</code></pre>
+
+<pre>
+  JvmTop 0.9.0   amd64,  4 cpus, Linux 5.15.0
+
+  PID 12345: org.apache.catalina.startup.Bootstrap
+  ARGS: start
+  VMARGS: -Djava.util.logging.config.file=/home/webserver/apache-tomcat[...]
+  VM: Oracle OpenJDK 64-Bit Server VM 17.0.4
+  UP: 120:15m #THR: 106  #THRPEAK: 143  #THRCREATED: 128020 USER: webserver
+  CPU:  4.55% GC:  3.25% HEAP: 137m / 227m NONHEAP:  75m / 304m
+   TID   NAME                                    STATE    CPU  TOTALCPU BLOCKEDBY
+      25 http-8080-Processor13                RUNNABLE  4.55%     1.60%
+  128022 RMI TCP Connection(18)-10.101.       RUNNABLE  1.82%     0.02%
+   36578 http-8080-Processor164               RUNNABLE  0.91%     2.35%
+</pre>
+
+<h4>Thread columns</h4>
+
+<table>
+<tr><th>Field</th><th>Description</th></tr>
+<tr><td><code>TID</code></td><td>Thread ID</td></tr>
+<tr><td><code>NAME</code></td><td>Thread name</td></tr>
+<tr><td><code>STATE</code></td><td>Current thread state (RUNNABLE, BLOCKED, WAITING, etc.)</td></tr>
+<tr><td><code>CPU</code></td><td>Current CPU utilization (ratio to available CPU time on all processors)</td></tr>
+<tr><td><code>TOTALCPU</code></td><td>CPU utilization since the thread was created (ratio to total process CPU)</td></tr>
+<tr><td><code>BLOCKEDBY</code></td><td>Thread ID that is blocking this thread, if any</td></tr>
+</table>
+
+<hr />
+
+<h3>Profile mode</h3>
+Use <code>--profile &lt;PID&gt;</code> to start a sampling-based CPU profiler on a specific JVM.
+This shows which methods consume the most CPU time, without altering the target JVM's classes.
+
+<pre><code>jvmtop --profile 12345</code></pre>
+
+<pre>
+  JvmTop 0.9.0   amd64,  8 cpus, Linux 5.15.0, load avg 0.41
+  https://github.com/MOschIT/jvmtop
+
+  Profiling PID 12345: org.apache.catalina.startup.Bootstrap
+
+   36.16% (    57.57s) com.example.service.UserService.processRequest()
+   30.36% (    48.33s) com.example.db.QueryExecutor.executeQuery()
+    7.14% (    11.37s) com.example.cache.CacheManager.get()
+    6.25% (     9.95s) com.example.json.JSONObject.write()
+    3.13% (     4.98s) com.example.logging.Logger.log()
+    3.13% (     4.98s) com.example.config.ConfigLoader.load()
+</pre>
+
+<p><b>Note:</b> The profiled JVM will experience increased CPU usage while profiling is active.
+The profiler uses a lower sample rate than traditional profilers, but is sufficient for identifying major performance issues.</p>
+
+<hr />
+
+<h3>Command-line options</h3>
+
+<table>
+<tr><th>Option</th><th>Description</th></tr>
+<tr><td><code>-?, -h, --help</code></td><td>Show help message and exit</td></tr>
+<tr><td><code>-d, --delay &lt;Double&gt;</code></td><td>Delay between each output iteration (in seconds)</td></tr>
+<tr><td><code>-n, --iteration &lt;Integer&gt;</code></td><td>Exit after the specified number of output iterations</td></tr>
+<tr><td><code>--once</code></td><td>Exit after the first output iteration (deprecated, use <code>-n 1</code> instead)</td></tr>
+<tr><td><code>-p, --pid &lt;Integer&gt;</code></td><td>Connect to a specific JVM by PID (enters detail mode)</td></tr>
+<tr><td><code>--profile</code></td><td>Start CPU profiling on the specified JVM (requires <code>-p &lt;PID&gt;</code>)</td></tr>
+<tr><td><code>--sysinfo</code></td><td>Output diagnostic system information and exit</td></tr>
+<tr><td><code>--threadlimit &lt;Integer&gt;</code></td><td>Set the number of threads displayed in detail mode</td></tr>
+<tr><td><code>--disable-threadlimit</code></td><td>Display all threads in detail mode (no limit)</td></tr>
+<tr><td><code>--threadnamewidth &lt;Integer&gt;</code></td><td>Set the displayed thread name length in detail mode (default: 30)</td></tr>
+<tr><td><code>--verbose</code></td><td>Enable verbose logging output</td></tr>
+<tr><td><code>-w, --width &lt;Integer&gt;</code></td><td>Set the console display width in columns</td></tr>
+</table>
+
+<hr />
+
 <h3>Installation</h3>
 Click on the <a href="https://github.com/MOschIT/jvmtop/releases">releases tab</a>, download the
 most recent tar.gz archive. Extract it, ensure that the <code>JAVA_HOME</code> environment variable points to a valid JDK and run <code>./jvmtop.sh</code>.<br><br>
@@ -62,7 +142,7 @@ Requires JDK 21+ and Maven.
 
 <pre><code>./build.sh</code></pre>
 
-This produces <code>target/jvmtop-0.9.0-SNAPSHOT.jar</code> and copies dependencies into <code>target/lib/</code>.
+This produces <code>target/jvmtop-0.9.0.jar</code> and copies dependencies into <code>target/lib/</code>.
 
 <h4>Running on JDK 9+</h4>
 Jvmtop uses internal JDK APIs (<code>sun.jvmstat.monitor</code>, <code>jdk.internal.agent</code>, etc.)
@@ -72,36 +152,7 @@ that are encapsulated starting with JDK 9. You must pass <code>--add-opens</code
      --add-opens=jdk.management.agent/jdk.internal.agent=ALL-UNNAMED \
      --add-opens=java.rmi/sun.rmi.server=ALL-UNNAMED \
      --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
-     -jar target/jvmtop-0.9.0-SNAPSHOT.jar</code></pre>
-
-<hr />
-
-<h3>VM detail mode</h3>
-In <a href='https://github.com/MOschIT/jvmtop/blob/master/doc/ExampleOutput.md'>VM detail mode</a> it shows you the top CPU-consuming threads, beside detailed metrics:<br>
-<br>
-
-<pre>
-  JvmTop 0.9.0   amd64,  4 cpus, Linux 5.15.0
-
-  PID 3539: org.apache.catalina.startup.Bootstrap
-  ARGS: start
-  VMARGS: -Djava.util.logging.config.file=/home/webserver/apache-tomcat[...]
-  VM: Oracle OpenJDK 64-Bit Server VM 17.0.4
-  UP: 120:15m #THR: 106  #THRPEAK: 143  #THRCREATED: 128020 USER: webserver
-  CPU:  4.55% GC:  3.25% HEAP: 137m / 227m NONHEAP:  75m / 304m
-   TID   NAME                                    STATE    CPU  TOTALCPU BLOCKEDBY
-      25 http-8080-Processor13                RUNNABLE  4.55%     1.60%
-  128022 RMI TCP Connection(18)-10.101.       RUNNABLE  1.82%     0.02%
-   36578 http-8080-Processor164               RUNNABLE  0.91%     2.35%
-</pre>
-
-<hr />
-
-<h3>Command-line options</h3>
-
-<pre><code>jvmtop --help</code></pre>
-
-Shows all available options including <code>--delay</code>, <code>--once</code>, <code>--pid</code>, <code>--profile</code>, and more.
+     -jar target/jvmtop-0.9.0.jar</code></pre>
 
 <hr />
 

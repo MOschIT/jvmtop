@@ -6,7 +6,7 @@ cd "$(dirname "$0")"
 echo "Building jvmtop..."
 mvn clean package
 
-JAR="target/jvmtop-0.9.0-SNAPSHOT.jar"
+JAR="target/jvmtop-0.9.0.jar"
 LIB="target/lib"
 
 if [ -f "$JAR" ] && [ -d "$LIB" ]; then
