@@ -90,17 +90,50 @@ public class LocalVirtualMachine {
   }
 
   private static String getDisplayName(String commandLine) {
-    // trim the pathname of jar file if it's a jar
-    String[] res = commandLine.split(" ", 2);
-    if (res[0].endsWith(".jar")) {
-      File jarfile = new File(res[0]);
-      String displayName = jarfile.getName();
-      if (res.length == 2) {
-        displayName += " " + res[1];
-      }
-      return displayName;
+    if (commandLine == null || commandLine.isEmpty()) {
+      return commandLine;
     }
-    return commandLine;
+
+    String[] tokens = commandLine.split("\\s+");
+    if (tokens.length == 0) {
+      return commandLine;
+    }
+
+    // If the first token is a .jar file (no "java" prefix), extract the filename
+    if (tokens[0].endsWith(".jar")) {
+      String name = new File(tokens[0]).getName();
+      if (tokens.length > 1) {
+        StringBuilder sb = new StringBuilder(name);
+        for (int i = 1; i < tokens.length; i++) {
+          sb.append(" ").append(tokens[i]);
+        }
+        return sb.toString();
+      }
+      return name;
+    }
+
+    for (int i = 1; i < tokens.length; i++) {
+      String token = tokens[i];
+      if (token.equals("-jar") && i + 1 < tokens.length) {
+        String jarPath = tokens[i + 1];
+        String displayName = new File(jarPath).getName();
+        if (i + 2 < tokens.length) {
+          StringBuilder sb = new StringBuilder(displayName);
+          for (int j = i + 2; j < tokens.length; j++) {
+            sb.append(" ").append(tokens[j]);
+          }
+          return sb.toString();
+        }
+        return displayName;
+      } else if (!token.startsWith("-")) {
+        if (token.endsWith(".jar")) {
+          return new File(token).getName();
+        }
+        return token;
+      }
+    }
+
+    return tokens[0];
   }
 
   public int vmid() {
