@@ -1,13 +1,10 @@
-<b>jvmtop</b> is a lightweight console application to monitor all accessible, running jvms on a machine.<br>
-In a top-like manner, it displays <a href='https://github.com/MOschIT/jvmtop/blob/master/doc/ExampleOutput.md'>JVM internal metrics</a> (e.g. memory information) of running java processes.<br>
+<b>jvmtop</b> is a lightweight console application to monitor all accessible, running JVMs on a machine.<br>
+In a top-like manner, it displays JVM internal metrics (e.g. memory information) of running Java processes.<br>
 <br>
-Jvmtop does also include a <a href='https://github.com/MOschIT/jvmtop/blob/master/doc/ConsoleProfiler.md'>CPU console profiler</a>.<br>
+Jvmtop also includes a CPU console profiler.<br>
 <br>
 It's tested with different releases of Oracle JDK, IBM JDK and OpenJDK on Linux, Solaris, FreeBSD and Windows hosts.<br>
 Jvmtop requires a JDK - a JRE will not suffice.<br>
-<br>
-Please note that it's currently in an alpha state -<br>
-if you experience an issue or need further help, please <a href='https://github.com/MOschIT/jvmtop/issues'>let us know</a>.<br>
 <br>
 Jvmtop is open-source. Checkout the <a href='https://github.com/MOschIT/jvmtop'>source code</a>. Patches are very welcome!<br>
 <br>
@@ -20,24 +17,43 @@ This project is a fork of <a href='https://github.com/patric-r/jvmtop'>jvmtop</a
 The original code is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License v2.0</a>.<br>
 This fork is also licensed under the GPL v2.0.
 
-```
- JvmTop 0.8.0 alpha   amd64  8 cpus, Linux 2.6.32-27, load avg 0.12
- https://github.com/MOschIT/jvmtop
+<hr />
 
-  PID MAIN-CLASS      HPCUR HPMAX NHCUR NHMAX    CPU     GC    VM USERNAME   #T DL
- 3370 rapperSimpleApp  165m  455m  109m  176m  0.12%  0.00% S6U37 web        21
-11272 ver.resin.Resin [ERROR: Could not attach to VM]
-27338 WatchdogManager   11m   28m   23m  130m  0.00%  0.00% S6U37 web        31
-19187 m.jvmtop.JvmTop   20m 3544m   13m  130m  0.93%  0.47% S6U37 web        20
-16733 artup.Bootstrap  159m  455m  166m  304m  0.12%  0.00% S6U37 web        46
-```
+<h3>Overview</h3>
+
+<pre>
+  JvmTop 0.9.0   amd64,  8 cpus, Linux 5.15.0, load avg 0.42
+  https://github.com/MOschIT/jvmtop
+
+   PID MAIN-CLASS        HPCUR   HPMAX   NHCUR   NHMAX     CPU      GC VM     USERNAME   #T DL
+ 12345 app.MainApp        256m  4096m    128m   512m   2.34%   0.12% 21.0.2 user       45
+ 23456 tomcat.Bootstrap   512m  8192m    256m   768m   5.67%   1.23% 17.0.4 web        89
+</pre>
+
+<h4>Column descriptions</h4>
+
+<table>
+<tr><th>Field</th><th>Description</th></tr>
+<tr><td><code>PID</code></td><td>Process ID of the JVM</td></tr>
+<tr><td><code>MAIN-CLASS</code></td><td>Main class or JAR file the JVM was started with</td></tr>
+<tr><td><code>HPCUR</code></td><td>Currently used heap memory</td></tr>
+<tr><td><code>HPMAX</code></td><td>Maximum heap memory</td></tr>
+<tr><td><code>NHCUR</code></td><td>Currently used non-heap memory</td></tr>
+<tr><td><code>NHMAX</code></td><td>Maximum non-heap memory</td></tr>
+<tr><td><code>CPU</code></td><td>CPU usage percentage (since last refresh)</td></tr>
+<tr><td><code>GC</code></td><td>Percentage of time spent in garbage collection</td></tr>
+<tr><td><code>VM</code></td><td>JVM vendor and version</td></tr>
+<tr><td><code>USERNAME</code></td><td>Operating system user running the JVM</td></tr>
+<tr><td><code>#T</code></td><td>Current number of live threads</td></tr>
+<tr><td><code>DL</code></td><td>Deadlock indicator — <code>!D</code> if deadlocked threads are detected</td></tr>
+</table>
 
 <hr />
 
 <h3>Installation</h3>
-Click on the <a href="https://github.com/MOschIT/jvmtop/releases"> releases tab</a>, download the
-most recent tar.gz archive. Extract it, ensure that the `JAVA_HOME` environment variable points to a valid JDK and run `./jvmtop.sh`.<br><br>
-Further information can be found in the [INSTALL file](https://github.com/MOschIT/jvmtop/blob/master/INSTALL)
+Click on the <a href="https://github.com/MOschIT/jvmtop/releases">releases tab</a>, download the
+most recent tar.gz archive. Extract it, ensure that the <code>JAVA_HOME</code> environment variable points to a valid JDK and run <code>./jvmtop.sh</code>.<br><br>
+Further information can be found in the <a href="https://github.com/MOschIT/jvmtop/blob/master/INSTALL">INSTALL file</a>
 
 <hr />
 
@@ -58,44 +74,35 @@ that are encapsulated starting with JDK 9. You must pass <code>--add-opens</code
      --add-opens=java.rmi/sun.rmi.transport=ALL-UNNAMED \
      -jar target/jvmtop-0.9.0-SNAPSHOT.jar</code></pre>
 
+<hr />
 
+<h3>VM detail mode</h3>
+In <a href='https://github.com/MOschIT/jvmtop/blob/master/doc/ExampleOutput.md'>VM detail mode</a> it shows you the top CPU-consuming threads, beside detailed metrics:<br>
+<br>
 
-<h3>08/14/2013 jvmtop 0.8.0 released</h3>
-<b>Changes:</b>
-<ul><li>improved attach compatibility for all IBM jvms<br>
-</li><li>fixed wrong CPU/GC values for IBM J9 jvms<br>
-</li><li>in case of unsupported heap size metric retrieval, n/a will be displayed instead of 0m<br>
-</li><li>improved argument parsing, support for short-options, added help (pass <code>--help</code>), see <a href='https://github.com/MOschIT/jvmtop/issues/28'>issue #28</a> (now using the great <a href='http://pholser.github.io/jopt-simple'>jopt-simple</a> library)<br>
-</li><li>when passing the <code>--once</code> option, terminal will not be cleared anymore (see <a href='https://github.com/MOschIT/jvmtop/issues/27'>issue #27</a>)<br>
-</li><li>improved shell script for guessing the path if a <code>JAVA_HOME</code> environment variable is not present (thanks to <a href='https://groups.google.com/forum/#!topic/jvmtop-discuss/KGg_WpL_yAU'>Markus Kolb</a>)</li></ul>
+<pre>
+  JvmTop 0.9.0   amd64,  4 cpus, Linux 5.15.0
 
-<a href='https://github.com/MOschIT/jvmtop/blob/master/doc/Changelog.md'>Full changelog</a>
+  PID 3539: org.apache.catalina.startup.Bootstrap
+  ARGS: start
+  VMARGS: -Djava.util.logging.config.file=/home/webserver/apache-tomcat[...]
+  VM: Oracle OpenJDK 64-Bit Server VM 17.0.4
+  UP: 120:15m #THR: 106  #THRPEAK: 143  #THRCREATED: 128020 USER: webserver
+  CPU:  4.55% GC:  3.25% HEAP: 137m / 227m NONHEAP:  75m / 304m
+   TID   NAME                                    STATE    CPU  TOTALCPU BLOCKEDBY
+      25 http-8080-Processor13                RUNNABLE  4.55%     1.60%
+  128022 RMI TCP Connection(18)-10.101.       RUNNABLE  1.82%     0.02%
+   36578 http-8080-Processor164               RUNNABLE  0.91%     2.35%
+</pre>
 
 <hr />
 
-In <a href='https://github.com/MOschIT/jvmtop/blob/master/doc/ExampleOutput.md'>VM detail mode</a> it shows you the top CPU-consuming threads, beside detailed metrics:<br>
-<br>
-<br>
+<h3>Command-line options</h3>
 
-```
- JvmTop 0.8.0 alpha   amd64,  4 cpus, Linux 2.6.18-34
- https://github.com/MOschIT/jvmtop
+<pre><code>jvmtop --help</code></pre>
 
- PID 3539: org.apache.catalina.startup.Bootstrap
- ARGS: start
- VMARGS: -Djava.util.logging.config.file=/home/webserver/apache-tomcat-5.5[...]
- VM: Sun Microsystems Inc. Java HotSpot(TM) 64-Bit Server VM 1.6.0_25
- UP: 869:33m #THR: 106  #THRPEAK: 143  #THRCREATED: 128020 USER: webserver
- CPU:  4.55% GC:  3.25% HEAP: 137m / 227m NONHEAP:  75m / 304m
-  TID   NAME                                    STATE    CPU  TOTALCPU BLOCKEDBY
-     25 http-8080-Processor13                RUNNABLE  4.55%     1.60%
- 128022 RMI TCP Connection(18)-10.101.       RUNNABLE  1.82%     0.02%
-  36578 http-8080-Processor164               RUNNABLE  0.91%     2.35%
-  36453 http-8080-Processor94                RUNNABLE  0.91%     1.52%
-     27 http-8080-Processor15                RUNNABLE  0.91%     1.81%
-     14 http-8080-Processor2                 RUNNABLE  0.91%     3.17%
- 128026 JMX server connection timeout   TIMED_WAITING  0.00%     0.00%
-```
+Shows all available options including <code>--delay</code>, <code>--once</code>, <code>--pid</code>, <code>--profile</code>, and more.
+
+<hr />
 
 <a href='https://github.com/MOschIT/jvmtop/issues'>Pull requests / bug reports</a> are always welcome.<br>
-<br>
