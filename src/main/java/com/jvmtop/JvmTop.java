@@ -4,6 +4,8 @@
  * Copyright (C) 2013 by Patric Rufflar. All rights reserved. DO NOT ALTER OR REMOVE COPYRIGHT
  * NOTICES OR THIS FILE HEADER.
  *
+ * Modified by MOschIT (fork at v0.8.0, released as v0.9.0).
+ *
  *
  * This code is free software; you can redistribute it and/or modify it under the terms of the GNU
  * General Public License version 2 only, as published by the Free Software Foundation.
@@ -48,7 +50,7 @@ import com.jvmtop.view.VMProfileView;
  */
 public class JvmTop {
 
-	public static final String VERSION = "0.8.0 alpha";
+	public static final String VERSION = "0.9.0";
 
 	private Double delay_ = 1.0;
 
@@ -307,7 +309,7 @@ public class JvmTop {
 		} else {
 			System.out.println();
 		}
-		System.out.println(" https://github.com/patric-r/jvmtop");
+		System.out.println(" https://github.com/MOschIT/jvmtop");
 		System.out.println();
 	}
 

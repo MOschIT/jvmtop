@@ -7,6 +7,33 @@
     <groupId>com.jvmtop</groupId>
     <artifactId>jvmtop</artifactId>
     <version>0.9.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>jvmtop</name>
+    <description>Java monitoring for the command-line. Forked from https://github.com/patric-r/jvmtop at v0.8.0.</description>
+    <url>https://github.com/MOschIT/jvmtop</url>
+
+    <licenses>
+        <license>
+            <name>GNU General Public License v2.0</name>
+            <url>https://www.gnu.org/licenses/old-licenses/gpl-2.0.html</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Patric Rufflar</name>
+            <roles>
+                <role>Original Author</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>MOschIT</name>
+            <roles>
+                <role>Maintainer</role>
+            </roles>
+        </developer>
+    </developers>
 
     <dependencies>
         <dependency>
