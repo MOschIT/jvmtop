@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import sun.jvmstat.monitor.HostIdentifier;
 import sun.jvmstat.monitor.MonitorException;
@@ -55,6 +57,8 @@ import com.sun.tools.attach.VirtualMachineDescriptor;
 // Sun private
 
 public class LocalVirtualMachine {
+  private static final Logger logger = Logger.getLogger("jvmtop");
+
   private String address;
 
   private String commandLine;
@@ -159,11 +163,14 @@ public class LocalVirtualMachine {
               "This virtual machine \"" + vmid + "\" does not support dynamic attach.");
     }
 
-    loadManagementAgent();
+    IOException cause = loadManagementAgent();
     // fails to load or start the management agent
     if (address == null) {
-      // should never reach here
-      throw new IOException("Fails to find connector address");
+      IOException e = new IOException("Fails to find connector address for PID " + vmid);
+      if (cause != null) {
+        e.initCause(cause);
+      }
+      throw e;
     }
   }
 
@@ -259,9 +266,9 @@ public class LocalVirtualMachine {
             vm.detach();
           } catch (AttachNotSupportedException x) {
             // not attachable
-            x.printStackTrace(System.err);
+            logger.log(Level.FINE, "VM not attachable (PID=" + vmid + ")", x);
           } catch (NullPointerException e) {
-            e.printStackTrace(System.err);
+            logger.log(Level.FINE, "Null pointer while scanning VM (PID=" + vmid + ")", e);
           } catch (IOException x) {
             // ignore
           }
@@ -315,7 +322,7 @@ public class LocalVirtualMachine {
   }
 
   // load the management agent into the target VM
-  private void loadManagementAgent() throws IOException {
+  private IOException loadManagementAgent() throws IOException {
 
     try {
       VirtualMachine vm = VirtualMachine.attach(String.valueOf(vmid));
@@ -324,8 +331,10 @@ public class LocalVirtualMachine {
       this.address = vm.getAgentProperties().getProperty("com.sun.management.jmxremote.localConnectorAddress");
 
       vm.detach();
+      return null;
     } catch (AttachNotSupportedException | IOException e) {
-      e.printStackTrace();
+      logger.log(Level.FINE, "Failed to load management agent (PID=" + vmid + ")", e);
+      return new IOException(e);
     }
   }
 }

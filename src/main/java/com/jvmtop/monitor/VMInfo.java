@@ -212,16 +212,19 @@ public class VMInfo {
       if (rmiE.getMessage().contains("refused")) {
         Logger.getLogger("jvmtop")
               .log(Level.FINE, "connection refused (PID=" + vmid + ")", rmiE);
-        return createDeadVM(vmid, localvm, VMInfoState.CONNECTION_REFUSED);
+        return createDeadVM(vmid, localvm);
       }
-      rmiE.printStackTrace(System.err);
+      Logger.getLogger("jvmtop")
+              .log(Level.WARNING, "unexpected ConnectException (PID=" + vmid + ")", rmiE);
     } catch (IOException e) {
-      if (e.getMessage().contains("Permission denied")) {
+      if (e.getMessage().contains("Permission denied") ||
+          e.getMessage().contains("Fails to find connector address")) {
         Logger.getLogger("jvmtop")
               .log(Level.FINE, "could not attach (PID=" + vmid + ")", e);
         return createDeadVM(vmid, localvm, VMInfoState.CONNECTION_REFUSED);
       }
-      e.printStackTrace(System.err);
+      Logger.getLogger("jvmtop")
+              .log(Level.WARNING, "unexpected IOException (PID=" + vmid + ")", e);
     } catch (Exception e) {
       Logger.getLogger("jvmtop").log(Level.WARNING, "could not attach (PID=" + vmid + ")", e);
     }
@@ -275,7 +278,7 @@ public class VMInfo {
       return;
     }
 
-    if (proxyClient.isDead()) {
+    if (proxyClient == null || proxyClient.isDead()) {
       state_ = VMInfoState.DETACHED;
       return;
     }

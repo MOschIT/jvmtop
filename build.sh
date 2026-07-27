@@ -6,10 +6,11 @@ cd "$(dirname "$0")"
 echo "Building jvmtop..."
 mvn clean package
 
-JAR="target/jvmtop-0.9.0.jar"
-LIB="target/lib"
+VERSION=$(grep -m1 '<version>' pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/')
+JAR="./target/jvmtop-${VERSION}.jar"
+LIB="./target/lib"
 
-if [ -f "$JAR" ] && [ -d "$LIB" ]; then
+if [ -d "$LIB" ] && [ -n "$JAR" ]; then
   echo "Build successful."
   echo "JAR: $JAR"
   echo "Dependencies: $LIB/"
